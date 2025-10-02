@@ -1,0 +1,13 @@
+/_build/
+/cover/
+/doc/
+/deps/
+*.ez
+*.beam
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+.gemini/
