@@ -4,7 +4,7 @@ defmodule Goran.TimeUtils do
   """
 
   def truncate_to_second(%DateTime{} = dt) do
-    DateTime.truncate(dt, :second)
+    %{dt | microsecond: {0, 0}}
   end
 
   def now_utc do
