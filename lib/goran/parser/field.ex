@@ -3,6 +3,7 @@ defmodule Goran.Parser.Field do
   Parses individual cron expression fields.
   """
 
+  @spec parse_integer(binary(), integer(), integer()) :: {:ok, integer()} | {:error, :invalid_field_value}
   def parse_integer(str, min, max) do
     case Integer.parse(str) do
       {val, ""} when val >= min and val <= max -> {:ok, val}
