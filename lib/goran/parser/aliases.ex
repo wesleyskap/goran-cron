@@ -9,8 +9,19 @@ defmodule Goran.Parser.Aliases do
     "SEP" => "9", "OCT" => "10", "NOV" => "11", "DEC" => "12"
   }
 
-  def normalize(str) do
+  @days %{
+    "SUN" => "0", "MON" => "1", "TUE" => "2", "WED" => "3",
+    "THU" => "4", "FRI" => "5", "SAT" => "6"
+  }
+
+  def normalize_month(str) do
     Enum.reduce(@months, String.upcase(str), fn {text, num}, acc ->
+      String.replace(acc, text, num)
+    end)
+  end
+
+  def normalize_day(str) do
+    Enum.reduce(@days, String.upcase(str), fn {text, num}, acc ->
       String.replace(acc, text, num)
     end)
   end
