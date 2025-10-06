@@ -4,9 +4,32 @@ defmodule Goran.Parser.Field do
   """
   alias Goran.Parser.Step
 
-  def parse("*", min, max), do: {:ok, Enum.to_list(min..max)}
-
   def parse(str, min, max) do
+    if String.contains?(str, ",") do
+      parse_list(str, min, max)
+    else
+      parse_segment(str, min, max)
+    end
+  end
+
+  defp parse_list(str, min, max) do
+    str
+    |> String.split(",")
+    |> Enum.reduce_while({:ok, []}, fn part, {:ok, acc} ->
+      case parse_segment(part, min, max) do
+        {:ok, vals} -> {:cont, {:ok, acc ++ vals}}
+        error -> {:halt, error}
+      end
+    end)
+    |> case do
+      {:ok, list} -> {:ok, Enum.uniq(list) |> Enum.sort()}
+      err -> err
+    end
+  end
+
+  defp parse_segment("*", min, max), do: {:ok, Enum.to_list(min..max)}
+
+  defp parse_segment(str, min, max) do
     cond do
       String.contains?(str, "/") -> parse_with_step(str, min, max)
       String.contains?(str, "-") -> parse_range(str, min, max)
@@ -17,7 +40,7 @@ defmodule Goran.Parser.Field do
   defp parse_with_step(str, min, max) do
     case String.split(str, "/", parts: 2) do
       [base, step_str] ->
-        with {:ok, base_list} <- parse(base, min, max),
+        with {:ok, base_list} <- parse_segment(base, min, max),
              {:ok, stepped} <- Step.parse_step(base_list, step_str) do
           {:ok, stepped}
         end
