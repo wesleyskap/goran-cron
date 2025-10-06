@@ -2,13 +2,27 @@ defmodule Goran.Parser.Field do
   @moduledoc """
   Parses individual cron expression fields.
   """
+  alias Goran.Parser.Step
 
   def parse("*", min, max), do: {:ok, Enum.to_list(min..max)}
 
   def parse(str, min, max) do
     cond do
+      String.contains?(str, "/") -> parse_with_step(str, min, max)
       String.contains?(str, "-") -> parse_range(str, min, max)
       true -> parse_integer(str, min, max)
+    end
+  end
+
+  defp parse_with_step(str, min, max) do
+    case String.split(str, "/", parts: 2) do
+      [base, step_str] ->
+        with {:ok, base_list} <- parse(base, min, max),
+             {:ok, stepped} <- Step.parse_step(base_list, step_str) do
+          {:ok, stepped}
+        end
+
+      _ -> {:error, :invalid_step}
     end
   end
 
