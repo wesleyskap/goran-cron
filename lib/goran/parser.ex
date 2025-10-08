@@ -2,7 +2,7 @@ defmodule Goran.Parser do
   @moduledoc """
   Main parser entry point for cron expressions with optional seconds.
   """
-  alias Goran.Parser.{Field, Aliases}
+  alias Goran.Parser.{Field, Aliases, Validator}
 
   defstruct [
     :seconds,
@@ -20,14 +20,17 @@ defmodule Goran.Parser do
         parse_6_field(s, m, h, dom, mon, dow)
 
       [m, h, dom, mon, dow] ->
-        parse_5_field(m, h, dom, mon, dow)
+        parse_6_field("0", m, h, dom, mon, dow)
 
       _ -> {:error, :invalid_field_count}
     end
   end
 
-  defp parse_5_field(m, h, dom, mon, dow) do
-    parse_6_field("0", m, h, dom, mon, dow)
+  def validate(expr) do
+    case parse(expr) do
+      {:ok, _} -> :ok
+      {:error, reason} -> {:error, Validator.format_error(reason)}
+    end
   end
 
   defp parse_6_field(s, m, h, dom, mon, dow) do
