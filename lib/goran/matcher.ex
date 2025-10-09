@@ -4,6 +4,7 @@ defmodule Goran.Matcher do
   """
   alias Goran.Parser
   alias Goran.TimeUtils
+  alias Goran.Matcher.DayRules
 
   def match_now?(cron_or_expr) do
     match?(cron_or_expr, TimeUtils.now_utc())
@@ -20,27 +21,12 @@ defmodule Goran.Matcher do
     dow = Date.day_of_week(DateTime.to_date(dt))
     dow_norm = if dow == 7, do: 0, else: dow
 
-    match_second?(cron, dt.second) and
-      match_minute?(cron, dt.minute) and
-      match_hour?(cron, dt.hour) and
-      match_month?(cron, dt.month) and
-      match_day?(cron, dt.day, dow_norm)
-  end
+    s_ok = dt.second in cron.seconds
+    m_ok = dt.minute in cron.minutes
+    h_ok = dt.hour in cron.hours
+    mo_ok = dt.month in cron.months
+    d_ok = DayRules.matches_day?(cron.days_of_month, cron.days_of_week, dt.day, dow_norm)
 
-  defp match_second?(cron, s), do: s in cron.seconds
-  defp match_minute?(cron, m), do: m in cron.minutes
-  defp match_hour?(cron, h), do: h in cron.hours
-  defp match_month?(cron, mo), do: mo in cron.months
-
-  defp match_day?(cron, dom, dow) do
-    dom_all? = length(cron.days_of_month) == 31
-    dow_all? = length(cron.days_of_week) == 7
-
-    cond do
-      dom_all? and dow_all? -> true
-      dom_all? -> dow in cron.days_of_week
-      dow_all? -> dom in cron.days_of_month
-      true -> dom in cron.days_of_month or dow in cron.days_of_week
-    end
+    s_ok and m_ok and h_ok and mo_ok and d_ok
   end
 end
