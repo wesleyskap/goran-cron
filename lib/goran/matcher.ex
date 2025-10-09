@@ -4,6 +4,13 @@ defmodule Goran.Matcher do
   """
   alias Goran.Parser
 
+  def match?(expr, dt) when is_binary(expr) do
+    case Parser.parse(expr) do
+      {:ok, cron} -> match?(cron, dt)
+      _ -> false
+    end
+  end
+
   def match?(%Parser{} = cron, %DateTime{} = dt) do
     dow = Date.day_of_week(DateTime.to_date(dt))
     dow_norm = if dow == 7, do: 0, else: dow
@@ -21,8 +28,6 @@ defmodule Goran.Matcher do
   defp match_month?(cron, mo), do: mo in cron.months
 
   defp match_day?(cron, dom, dow) do
-    # When both day_of_month and day_of_week are specified (not all values),
-    # standard cron treats them as union OR match.
     dom_all? = length(cron.days_of_month) == 31
     dow_all? = length(cron.days_of_week) == 7
 
