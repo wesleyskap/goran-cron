@@ -3,6 +3,11 @@ defmodule Goran.Matcher do
   Matches timestamps against parsed cron schedules.
   """
   alias Goran.Parser
+  alias Goran.TimeUtils
+
+  def match_now?(cron_or_expr) do
+    match?(cron_or_expr, TimeUtils.now_utc())
+  end
 
   def match?(expr, dt) when is_binary(expr) do
     case Parser.parse(expr) do
