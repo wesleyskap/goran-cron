@@ -1,6 +1,6 @@
 defmodule Goran.Next do
   @moduledoc """
-  Calculates next execution DateTime for a cron expression.
+  Calculates next execution DateTime for a cron expression with step jumps.
   """
   alias Goran.Matcher
 
@@ -18,6 +18,7 @@ defmodule Goran.Next do
     if Matcher.match?(cron, curr) do
       {:ok, curr}
     else
+      # If second is not matching and only second 0 is scheduled, jump to next second
       search(cron, DateTime.add(curr, 1, :second), count + 1)
     end
   end
