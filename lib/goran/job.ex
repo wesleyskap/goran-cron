@@ -16,7 +16,7 @@ defmodule Goran.Job do
 
   @default_timeout_ms 60_000
 
-  def new(name, schedule, task, opts \\ []) do
+  def new(name, schedule, task, opts \\ []) when is_function(task, 0) or is_tuple(task) do
     with {:ok, cron} <- Parser.parse(schedule) do
       {:ok, %__MODULE__{
         name: name,
