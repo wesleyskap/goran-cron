@@ -30,6 +30,16 @@ defmodule Goran.Lease do
     end
   end
 
+  def release(job_name, token) do
+    case :ets.lookup(@table, job_name) do
+      [{^job_name, ^token, _exp, _holder}] ->
+        :ets.delete(@table, job_name)
+        :ok
+
+      _ -> {:error, :not_owner}
+    end
+  end
+
   defp force_take(job_name, token, expires_at) do
     :ets.insert(@table, {job_name, token, expires_at, self()})
     {:ok, token}
