@@ -7,6 +7,20 @@ defmodule Goran.Lease do
   @table :goran_leases
   @default_ttl_ms 30_000
 
+  def with_lease(job_name, ttl_ms \\ @default_ttl_ms, fun) when is_function(fun, 0) do
+    case acquire(job_name, ttl_ms) do
+      {:ok, token} ->
+        try do
+          res = fun.()
+          {:ok, res}
+        after
+          release(job_name, token)
+        end
+
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
   def acquire(job_name, ttl_ms \\ @default_ttl_ms) do
     Store.init_table()
     now = System.monotonic_time(:millisecond)
