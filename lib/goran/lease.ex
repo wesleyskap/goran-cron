@@ -29,7 +29,7 @@ defmodule Goran.Lease do
 
     case :ets.lookup(@table, job_name) do
       [{^job_name, _old_tok, old_exp, _holder}] ->
-        if now >= old_exp do
+        if Token.expired?(old_exp) do
           force_take(job_name, token, expires_at)
         else
           {:error, :locked}
