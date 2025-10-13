@@ -30,6 +30,17 @@ defmodule Goran.Lease do
     end
   end
 
+  def renew(job_name, token, ttl_ms \\ @default_ttl_ms) do
+    case :ets.lookup(@table, job_name) do
+      [{^job_name, ^token, _exp, _holder}] ->
+        new_exp = System.monotonic_time(:millisecond) + ttl_ms
+        :ets.insert(@table, {job_name, token, new_exp, self()})
+        :ok
+
+      _ -> {:error, :not_owner}
+    end
+  end
+
   def release(job_name, token) do
     case :ets.lookup(@table, job_name) do
       [{^job_name, ^token, _exp, _holder}] ->
