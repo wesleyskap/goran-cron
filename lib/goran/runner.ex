@@ -1,12 +1,18 @@
 defmodule Goran.Runner do
   @moduledoc """
-  Executes jobs asynchronously in supervised Tasks.
+  Executes jobs asynchronously in supervised Tasks with safe failure trapping.
   """
   alias Goran.Job
 
   def run_job(%Job{} = job) do
     Task.Supervisor.async_nolink(Goran.TaskSupervisor, fn ->
-      execute_task(job.task)
+      try do
+        {:ok, execute_task(job.task)}
+      rescue
+        e -> {:error, e}
+      catch
+        :exit, r -> {:error, {:exit, r}}
+      end
     end)
   end
 
