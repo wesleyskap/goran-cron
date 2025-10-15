@@ -31,8 +31,14 @@ defmodule Goran.Scheduler do
   @impl true
   def init(_opts) do
     state = %__MODULE__{jobs: %{}, poll_timer: nil}
-    schedule_poll(Config.poll_interval_ms())
-    {:ok, state}
+    {:ok, tref} = schedule_poll(Config.poll_interval_ms())
+    {:ok, %{state | poll_timer: tref}}
+  end
+
+  @impl true
+  def terminate(_reason, state) do
+    cancel_timer(state.poll_timer)
+    :ok
   end
 
   @impl true
@@ -82,4 +88,7 @@ defmodule Goran.Scheduler do
   defp schedule_poll(interval) do
     :timer.send_interval(interval, :poll_tick)
   end
+
+  defp cancel_timer(nil), do: :ok
+  defp cancel_timer(tref), do: :timer.cancel(tref)
 end
