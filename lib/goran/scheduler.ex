@@ -3,7 +3,7 @@ defmodule Goran.Scheduler do
   Core GenServer managing cron schedules and execution timers.
   """
   use GenServer
-  alias Goran.{Config, Job, TimeUtils}
+  alias Goran.{Config, Job, TimeUtils, Runner, Lease}
   alias Goran.Scheduler.Dispatch
 
   defstruct [:jobs, :poll_timer]
@@ -18,6 +18,10 @@ defmodule Goran.Scheduler do
 
   def remove_job(name) do
     GenServer.call(__MODULE__, {:remove_job, name})
+  end
+
+  def run_now(name) do
+    GenServer.call(__MODULE__, {:run_now, name})
   end
 
   def list_jobs do
@@ -47,6 +51,20 @@ defmodule Goran.Scheduler do
   def handle_call({:remove_job, name}, _from, state) do
     new_jobs = Map.delete(state.jobs, name)
     {:reply, :ok, %{state | jobs: new_jobs}}
+  end
+
+  @impl true
+  def handle_call({:run_now, name}, _from, state) do
+    case Map.get(state.jobs, name) do
+      nil -> {:reply, {:error, :not_found}, state}
+      job ->
+        spawn(fn ->
+          Lease.with_lease(name, job.timeout_ms, fn ->
+            Runner.run_job(job)
+          end)
+        end)
+        {:reply, :ok, state}
+    end
   end
 
   @impl true
