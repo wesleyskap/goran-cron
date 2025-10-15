@@ -15,6 +15,10 @@ defmodule Goran.Scheduler do
     GenServer.call(__MODULE__, {:add_job, name, schedule, task, opts})
   end
 
+  def remove_job(name) do
+    GenServer.call(__MODULE__, {:remove_job, name})
+  end
+
   def list_jobs do
     GenServer.call(__MODULE__, :list_jobs)
   end
@@ -36,6 +40,12 @@ defmodule Goran.Scheduler do
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
+  end
+
+  @impl true
+  def handle_call({:remove_job, name}, _from, state) do
+    new_jobs = Map.delete(state.jobs, name)
+    {:reply, :ok, %{state | jobs: new_jobs}}
   end
 
   @impl true
