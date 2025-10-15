@@ -3,7 +3,8 @@ defmodule Goran.Scheduler do
   Core GenServer managing cron schedules and execution timers.
   """
   use GenServer
-  alias Goran.{Config, Job}
+  alias Goran.{Config, Job, TimeUtils}
+  alias Goran.Scheduler.Dispatch
 
   defstruct [:jobs, :poll_timer]
 
@@ -51,6 +52,13 @@ defmodule Goran.Scheduler do
   @impl true
   def handle_call(:list_jobs, _from, state) do
     {:reply, Map.values(state.jobs), state}
+  end
+
+  @impl true
+  def handle_info(:poll_tick, state) do
+    now = TimeUtils.now_utc()
+    new_jobs = Dispatch.evaluate_and_run(state.jobs, now)
+    {:noreply, %{state | jobs: new_jobs}}
   end
 
   defp schedule_poll(interval) do
