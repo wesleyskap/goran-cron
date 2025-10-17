@@ -4,6 +4,15 @@ defmodule Goran do
   """
   alias Goran.{Scheduler, Parser, Matcher, Next, Lease}
 
+  def child_spec(opts) do
+    %{
+      id: __MODULE__,
+      start: {Scheduler, :start_link, [opts]},
+      type: :worker,
+      restart: :permanent
+    }
+  end
+
   defdelegate schedule(name, cron_expr, task, opts \\ []), to: Scheduler, as: :add_job
   defdelegate unschedule(name), to: Scheduler, as: :remove_job
   defdelegate jobs, to: Scheduler, as: :list_jobs
