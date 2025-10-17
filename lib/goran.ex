@@ -4,6 +4,7 @@ defmodule Goran do
   """
   alias Goran.{Scheduler, Parser, Matcher, Next, Lease}
   alias Goran.Lease.Info
+  alias Goran.Parser.Printer
 
   def child_spec(opts) do
     %{
@@ -22,6 +23,7 @@ defmodule Goran do
   end
 
   def lease_status(name), do: Info.status(name)
+  def format(%Parser{} = cron), do: Printer.print(cron)
 
   defdelegate schedule(name, cron_expr, task, opts \\ []), to: Scheduler, as: :add_job
   defdelegate unschedule(name), to: Scheduler, as: :remove_job
