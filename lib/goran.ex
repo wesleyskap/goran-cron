@@ -10,6 +10,7 @@ defmodule Goran do
   defdelegate trigger(name), to: Scheduler, as: :run_now
   defdelegate parse(expr), to: Parser, as: :parse
   defdelegate match?(cron_or_expr, dt), to: Matcher, as: :match?
+  defdelegate match_now?(cron_or_expr), to: Matcher, as: :match_now?
   defdelegate next(cron, from_dt), to: Next, as: :find_next
   defdelegate with_lease(name, ttl_ms \\ 30_000, fun), to: Lease, as: :with_lease
 end
