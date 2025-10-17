@@ -3,6 +3,7 @@ defmodule Goran do
   Main entry point for Goran cron scheduling and lease management.
   """
   alias Goran.{Scheduler, Parser, Matcher, Next, Lease}
+  alias Goran.Lease.Info
 
   def child_spec(opts) do
     %{
@@ -19,6 +20,8 @@ defmodule Goran do
     end)
     :ok
   end
+
+  def lease_status(name), do: Info.status(name)
 
   defdelegate schedule(name, cron_expr, task, opts \\ []), to: Scheduler, as: :add_job
   defdelegate unschedule(name), to: Scheduler, as: :remove_job
