@@ -9,6 +9,7 @@ defmodule Goran do
   defdelegate jobs, to: Scheduler, as: :list_jobs
   defdelegate trigger(name), to: Scheduler, as: :run_now
   defdelegate parse(expr), to: Parser, as: :parse
+  defdelegate validate(expr), to: Parser, as: :validate
   defdelegate match?(cron_or_expr, dt), to: Matcher, as: :match?
   defdelegate match_now?(cron_or_expr), to: Matcher, as: :match_now?
   defdelegate next(cron, from_dt), to: Next, as: :find_next
