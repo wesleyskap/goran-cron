@@ -13,6 +13,13 @@ defmodule Goran do
     }
   end
 
+  def schedule_batch(job_definitions) when is_list(job_definitions) do
+    Enum.each(job_definitions, fn {name, expr, task} ->
+      schedule(name, expr, task)
+    end)
+    :ok
+  end
+
   defdelegate schedule(name, cron_expr, task, opts \\ []), to: Scheduler, as: :add_job
   defdelegate unschedule(name), to: Scheduler, as: :remove_job
   defdelegate jobs, to: Scheduler, as: :list_jobs
