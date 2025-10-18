@@ -20,6 +20,18 @@ Distributed cluster-wide job scheduler and cron execution engine for Elixir and 
 | Month | 1-12 or JAN-DEC | ``*`` ``,`` ``-`` ``/`` |
 | Day of Week | 0-6 (0=Sun) or SUN-SAT | ``*`` ``,`` ``-`` ``/`` |
 
+## Supervision Integration
+
+Add ``Goran`` to your application supervisor tree:
+
+``````elixir
+children = [
+  Goran
+]
+
+Supervisor.start_link(children, strategy: :one_for_one)
+``````
+
 ## Installation
 
 Add ``goran`` to your list of dependencies in ``mix.exs``:
