@@ -9,6 +9,17 @@ Distributed cluster-wide job scheduler and cron execution engine for Elixir and 
 - **Resilient Execution**: Isolated task execution supervised under dynamic OTP process trees.
 - **Telemetry Ready**: Complete instrumentation for job lifecycles and miss warnings.
 
+## Cron Syntax Reference
+
+| Field | Allowed Values | Special Characters |
+| :--- | :--- | :--- |
+| Seconds (optional) | 0-59 | ``*`` ``,`` ``-`` ``/`` |
+| Minutes | 0-59 | ``*`` ``,`` ``-`` ``/`` |
+| Hours | 0-23 | ``*`` ``,`` ``-`` ``/`` |
+| Day of Month | 1-31 | ``*`` ``,`` ``-`` ``/`` |
+| Month | 1-12 or JAN-DEC | ``*`` ``,`` ``-`` ``/`` |
+| Day of Week | 0-6 (0=Sun) or SUN-SAT | ``*`` ``,`` ``-`` ``/`` |
+
 ## Installation
 
 Add ``goran`` to your list of dependencies in ``mix.exs``:
